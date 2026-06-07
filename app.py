@@ -12,7 +12,7 @@ client = OpenAI(
 )
 
 # タイトル
-st.title("AIメール秘書")
+st.title("SmartReply")
 
 # 入力欄
 mail_text = st.text_area(
