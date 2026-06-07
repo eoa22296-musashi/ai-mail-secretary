@@ -3,25 +3,32 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
+# .env読み込み
 load_dotenv()
 
+# OpenAI接続
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
+# タイトル
 st.title("AIメール秘書")
 
+# 入力欄
 mail_text = st.text_area(
     "メール本文を入力してください",
     height=250
 )
 
+# ボタン
 if st.button("解析する"):
 
+    # 未入力チェック
     if not mail_text:
         st.warning("メール本文を入力してください")
         st.stop()
 
+    # AIへの指示
     prompt = f"""
 以下のメールを解析してください。
 
@@ -32,9 +39,12 @@ summary=要約
 category=分類
 
 reply=返信案
+
+メール本文:
 {mail_text}
 """
 
+    # AI実行
     with st.spinner("AI解析中..."):
 
         response = client.chat.completions.create(
@@ -49,18 +59,23 @@ reply=返信案
 
         result = response.choices[0].message.content
 
-st.subheader("要約")
-st.info(result.split("category=")[0].replace("summary=", "").strip())
+    # 表示
+    st.subheader("要約")
+    st.info(
+        result.split("category=")[0]
+        .replace("summary=", "")
+        .strip()
+    )
 
-st.subheader("分類")
-st.info(
-    result.split("category=")[1]
-    .split("reply=")[0]
-    .strip()
-)
+    st.subheader("分類")
+    st.info(
+        result.split("category=")[1]
+        .split("reply=")[0]
+        .strip()
+    )
 
-st.subheader("返信案")
-st.success(
-    result.split("reply=")[1]
-    .strip()
-)
+    st.subheader("返信案")
+    st.success(
+        result.split("reply=")[1]
+        .strip()
+    )
